@@ -13,7 +13,7 @@ permissions:
 
 jobs:
   build:
-    name: Build Debug APK
+    name: Build MEMORA APK
     runs-on: ubuntu-latest
 
     steps:
@@ -30,12 +30,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: "21"
-
-      -      - name: Setup Android SDK
-        uses: android-actions/setup-android@v4
-        with:
-          packages: 'platform-tools'
+          java-version: "17"
 
       - name: Install dependencies
         run: npm ci
@@ -43,10 +38,16 @@ jobs:
       - name: Build web app
         run: npm run build
 
-      - name: Sync Capacitor Android
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Add Android platform
+        run: npx cap add android
+
+      - name: Sync Android
         run: npx cap sync android
 
-      - name: Build APK
+      - name: Build debug APK
         working-directory: android
         run: |
           chmod +x gradlew
@@ -56,6 +57,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: MEMORA-debug-APK
-          path: android/app/build/outputs/apk/debug/*.apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 7
